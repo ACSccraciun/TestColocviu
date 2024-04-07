@@ -2,10 +2,12 @@ package ro.pub.cs.systems.eim.practicaltest01;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class PracticalTest01MainActivity extends AppCompatActivity {
 
@@ -13,6 +15,8 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
     private TextView counter2;
 
     private Button press, press_too, second_activity;
+
+    private int REQUEST_CODE = 1473;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,18 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
                 counter2.setText(new_value.toString());
             }
         });
+
+        second_activity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PracticalTest01MainActivity.this, PracticalTest01SecondaryActivity.class);
+
+                Integer sum = Integer.parseInt(counter1.getText().toString()) + Integer.parseInt(counter2.getText().toString());
+                intent.putExtra("sum", sum.toString());
+
+                startActivityForResult(intent, REQUEST_CODE);
+            }
+        });
     }
 
     @Override
@@ -70,5 +86,17 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
        // outState.putString(KEY_TEXT_VALUE, editText.getText().toString());
         outState.putString("counter1", counter1.getText().toString());
         outState.putString("counter2", counter2.getText().toString());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "CANCEL", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
