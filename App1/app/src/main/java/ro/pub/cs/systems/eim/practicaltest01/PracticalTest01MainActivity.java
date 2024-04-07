@@ -3,6 +3,7 @@ package ro.pub.cs.systems.eim.practicaltest01;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +18,13 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
     private Button press, press_too, second_activity;
 
     private int REQUEST_CODE = 1473;
+
+    private int THRESHOLD = 5;
+
+    private boolean serviceStarted = false;
+
+    private MyBroadcastReceiver receiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +46,14 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
                 counter2.setText(savedText);
             }
         }
+
+        receiver = new MyBroadcastReceiver();
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("action1");
+        intentFilter.addAction("action2");
+        intentFilter.addAction("action3");
+        registerReceiver(receiver, intentFilter);
     }
 
     private void init() {
@@ -56,6 +72,15 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Integer new_value = Integer.parseInt(counter1.getText().toString()) + 1;
                 counter1.setText(new_value.toString());
+
+                Integer sum = Integer.parseInt(counter1.getText().toString()) + Integer.parseInt(counter2.getText().toString());
+                if (sum > THRESHOLD && !serviceStarted) {
+                    Intent serviceIntent = new Intent(PracticalTest01MainActivity.this, PracticalTest01Service.class);
+                    serviceIntent.putExtra("number1", Integer.parseInt(counter1.getText().toString()));
+                    serviceIntent.putExtra("number2", Integer.parseInt(counter2.getText().toString()));
+                    startService(serviceIntent);
+                    serviceStarted = true;
+                }
             }
         });
 
@@ -64,6 +89,15 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Integer new_value = Integer.parseInt(counter2.getText().toString()) + 1;
                 counter2.setText(new_value.toString());
+
+                Integer sum = Integer.parseInt(counter1.getText().toString()) + Integer.parseInt(counter2.getText().toString());
+                if (sum > THRESHOLD && !serviceStarted) {
+                    Intent serviceIntent = new Intent(PracticalTest01MainActivity.this, PracticalTest01Service.class);
+                    serviceIntent.putExtra("number1", Integer.parseInt(counter1.getText().toString()));
+                    serviceIntent.putExtra("number2", Integer.parseInt(counter2.getText().toString()));
+                    startService(serviceIntent);
+                    serviceStarted = true;
+                }
             }
         });
 
@@ -98,5 +132,15 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "CANCEL", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Intent serviceIntent = new Intent(PracticalTest01MainActivity.this, PracticalTest01Service.class);
+        stopService(serviceIntent);
+
+        unregisterReceiver(receiver);
     }
 }
