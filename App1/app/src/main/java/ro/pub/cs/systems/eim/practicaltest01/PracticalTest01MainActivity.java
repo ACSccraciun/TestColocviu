@@ -22,8 +22,18 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
         init();
         buttonListeners();
 
-        counter1.setSaveEnabled(false);
-        counter2.setSaveEnabled(false);
+        if (savedInstanceState != null) {
+            String savedText = savedInstanceState.getString("counter1");
+            if (savedText != null) {
+                counter1.setText(savedText);
+            }
+
+            savedText = savedInstanceState.getString("counter2");
+
+            if (savedText != null) {
+                counter2.setText(savedText);
+            }
+        }
     }
 
     private void init() {
@@ -54,5 +64,11 @@ public class PracticalTest01MainActivity extends AppCompatActivity {
         });
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+       // outState.putString(KEY_TEXT_VALUE, editText.getText().toString());
+        outState.putString("counter1", counter1.getText().toString());
+        outState.putString("counter2", counter2.getText().toString());
+    }
 }
